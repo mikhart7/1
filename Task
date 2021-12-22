@@ -1,57 +1,101 @@
+open class Person(var name:String, val idNumber:Int){
 
-
-#include <iostream>
-#include <vector>
-#include <numeric>
-using namespace std;
-struct SegmentTree {
-    vector <int> t;
-    int half;
-    SegmentTree (vector <int> & a, int n) {
-        half = 1;
-        while (half < n) half *= 2;
-        t = vector <int> (half * 2);
-        for (int i = 0; i < n; i++)
-            t[i + half] = a[i];
-        for (int i = half - 1; i >= 1; i--)
-            t[i] = min(t[i * 2],t[i * 2 + 1]);
-    }
-    int sum (int lo, int hi) {
-        lo--;
-        hi--;
-        int res = 1000000000;
-        for (lo += half, hi += half;
-        lo <= hi;
-        lo /= 2, hi /= 2) {
-            if (lo & 1){
-                res = min(res,t[lo++]);
-            }
-            if (!(hi & 1)){
-                res = min(res,t[hi--]);
-            }
-        }
-
-        return res;
-    }
-};
-
-
-
-int main () {
-    int n,m;cin>>n>>m;
-    vector<int>v(n);
-    for (int i = 0; i < n; ++i) {
-        cin>>v[i];
-    }
-    SegmentTree segment = SegmentTree(v, n);
-    for (int i = 0; i < m; ++i) {
-        int k,l;cin>>k>>l;
-        for (int j = 0; j < n; ++j) {
-            if(v[j]==segment.sum(k,l)){
-                cout<<j+1<<'\n';
-                break;
-            }
+    var ticket = Pair(Flight(Airplane(),0),0)
+    open fun book(seatNumber:Int,flight:Flight){
+       if(flight.seats[seatNumber]==null){
+           flight.addPerson(idNumber,seatNumber)
+           ticket = Pair(flight,seatNumber)
+       }
+   }
+    var registred = false
+    fun registration(flight: Flight){
+        if(flight.registration(this)){
+            registred = true
         }
     }
-    return 0;
+
+
+}
+class Passenger(name: String, idNumber: Int):Person(name, idNumber)  {
+
+}
+enum class JobFunction{
+    PassengerServiceAgent,
+    Pilot,
+    Stewardess,
+    Kitchener,
+    FlightEngineer,
+    RegistrationAgents,
+    SupportAgents,
+    Null
+}
+class Employee(val job_function:JobFunction, name: String, idNumber: Int):Person(name, idNumber){
+    val director = JobFunction.Null
+}
+
+
+class Airline(){
+    val airplanes = mutableListOf<Airplane>()
+    val flights = mutableListOf<Flight>()
+    val flightTimes  = mutableListOf<Int>()
+    fun addFlight(flight: Flight){
+        if (!flightTimes.contains(flight.startTime)){
+            flightTimes.add(flight.startTime)
+            flight.permission = true
+        }
+    }
+}
+
+class Airplane{
+    val seatsSize  = 40
+
+}
+open class Flight(val airplane: Airplane,val flightNumber:Int){
+
+    val startTime =0
+    val duration =0
+    var permission = false
+
+    var seats = mutableMapOf<Int,Int>()
+
+    fun addPerson(personId: Int,idNumber: Int){
+        seats[idNumber]= personId
+    }
+    fun registration(person: Person):Boolean{
+        if(seats[person.idNumber]!=null && seats.keys.size<airplane.seatsSize){
+            person.registration(this)
+            return true
+        }
+        return false
+    }
+}
+class RegularFlight(airplane: Airplane, flightNumber: Int):Flight(airplane, flightNumber){
+
+}
+
+class SpecificFlight(val date:String, airplane: Airplane, flightNumber: Int):Flight(airplane, flightNumber){
+}
+
+enum class Action{
+    flyUp,
+    landed,
+    inAirport
+}
+
+class FlightLog(val flight: Flight){
+    val currentTime =0
+
+    fun log(): Action {
+        if(flight.startTime==currentTime){
+            return Action.flyUp
+        }
+        if(flight.startTime+flight.duration==currentTime){
+            return Action.landed
+        }
+        return Action.inAirport
+
+    }
+
+}
+fun main(){
 }
